@@ -1,0 +1,16 @@
+{"type": "AI_CONCEPTS", "questions": [
+  {"slug": "iv-ai-rag-design", "difficulty": "MEDIUM", "title": "Designing a RAG pipeline",
+   "prompt": "Design a question-answering feature over a company's internal docs using retrieval-augmented generation. Walk through ingestion and query time.",
+   "expectedConcepts": ["Ingestion: parsing, chunking, embeddings, metadata", "Vector index (ANN, e.g. HNSW)", "Hybrid retrieval and re-ranking", "Access control filtering at retrieval time", "Citations/grounding", "Evaluation set and metrics", "Freshness and re-indexing"],
+   "answerOutline": "Two pipelines: offline indexing and online query. Emphasise permission-aware retrieval, evaluation, and handling 'no good context' honestly.",
+   "commonMistakes": ["Ignoring document permissions", "No evaluation plan", "Treating the model as the knowledge source"],
+   "followUps": ["How do you detect and reduce hallucinations?", "How do you handle prompt injection inside documents?"],
+   "rubricNotes": "Security and evaluation awareness separate strong answers."},
+  {"slug": "iv-ai-agent-safety", "difficulty": "HARD", "title": "Safe tool-using agents",
+   "prompt": "An LLM agent can call tools such as sending email and querying a database. What risks exist and how do you design around them?",
+   "expectedConcepts": ["Prompt injection (direct and indirect)", "Least-privilege tools and scoped credentials", "Human confirmation for irreversible actions", "Argument validation and allowlists", "Audit logging", "Rate and cost limits", "PII handling"],
+   "answerOutline": "Treat model output as untrusted input to your system: validate tool calls, limit capabilities, require confirmation for risky actions, and log everything.",
+   "commonMistakes": ["Relying on the system prompt alone for security", "Giving the agent admin credentials"],
+   "followUps": ["How would MCP servers fit in, and what trust boundaries exist?", "How do you test this?"],
+   "rubricNotes": "Look for defence in depth rather than a single control."}
+]}

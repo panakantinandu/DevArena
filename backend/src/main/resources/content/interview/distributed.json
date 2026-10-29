@@ -1,0 +1,16 @@
+{"type": "DISTRIBUTED_SYSTEMS", "questions": [
+  {"slug": "iv-dist-idempotency", "difficulty": "MEDIUM", "title": "Idempotent APIs",
+   "prompt": "A client retries POST /payments after a timeout. How do you make sure the customer isn't charged twice?",
+   "expectedConcepts": ["Idempotency keys supplied by the client", "Store the key with a unique constraint and the result", "Return the stored response for duplicates", "Handle concurrent duplicates (in-progress state)", "Key expiry"],
+   "answerOutline": "The client generates a key per logical operation; the server atomically records it, processes once, stores the outcome, and replays the outcome on retries. Discuss the race between two simultaneous retries.",
+   "commonMistakes": ["Server-generated keys (the client can't reuse them)", "Checking then inserting without a unique constraint", "Ignoring the timeout-unknown-outcome case"],
+   "followUps": ["What if the downstream provider timed out?", "How long do you keep keys?"],
+   "rubricNotes": "5 requires handling concurrent duplicates explicitly."},
+  {"slug": "iv-dist-exactly-once", "difficulty": "HARD", "title": "Exactly-once processing",
+   "prompt": "Your consumer reads order events from a queue and updates inventory. How do you avoid double-decrementing stock?",
+   "expectedConcepts": ["At-least-once delivery is the realistic default", "Idempotent consumers", "Dedup table keyed by event ID in the same transaction", "Outbox on the producer side", "Ordering per key"],
+   "answerOutline": "Accept at-least-once delivery, make the effect idempotent by recording processed event IDs in the same DB transaction as the stock update, and use partition keys for ordering.",
+   "commonMistakes": ["Assuming the broker guarantees exactly-once end to end", "Dedup checks outside the transaction"],
+   "followUps": ["How do you replay events safely?", "What about poison messages?"],
+   "rubricNotes": "Reward candidates who name the dual-write problem."}
+]}

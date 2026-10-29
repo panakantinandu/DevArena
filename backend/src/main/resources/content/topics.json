@@ -1,0 +1,57 @@
+[
+  {"slug": "arrays", "name": "Arrays", "category": "DSA", "description": "Indexing, prefix sums, in-place updates."},
+  {"slug": "strings", "name": "Strings", "category": "DSA", "description": "Immutability, builders, character counting."},
+  {"slug": "hashing", "name": "Hashing", "category": "DSA", "description": "Hash maps and sets for O(1) average lookups."},
+  {"slug": "two-pointers", "name": "Two pointers", "category": "DSA", "description": "Walking a sequence from both ends or at two speeds."},
+  {"slug": "sliding-window", "name": "Sliding window", "category": "DSA", "description": "Maintaining a contiguous range incrementally."},
+  {"slug": "binary-search", "name": "Binary search", "category": "DSA", "description": "Halving a monotonic search space."},
+  {"slug": "linked-lists", "name": "Linked lists", "category": "DSA", "description": "Pointer manipulation, cycles, reversal."},
+  {"slug": "stacks-queues", "name": "Stacks & queues", "category": "DSA", "description": "LIFO/FIFO structures and monotonic stacks."},
+  {"slug": "trees", "name": "Trees", "category": "DSA", "description": "Traversals, BSTs, recursion on trees."},
+  {"slug": "heaps", "name": "Heaps", "category": "DSA", "description": "Priority queues and top-k problems."},
+  {"slug": "graphs", "name": "Graphs", "category": "DSA", "description": "BFS, DFS, topological sort, shortest paths."},
+  {"slug": "backtracking", "name": "Backtracking", "category": "DSA", "description": "Exhaustive search with pruning."},
+  {"slug": "dynamic-programming", "name": "Dynamic programming", "category": "DSA", "description": "Overlapping subproblems and optimal substructure."},
+  {"slug": "greedy", "name": "Greedy algorithms", "category": "DSA", "description": "Locally optimal choices that are globally optimal."},
+
+  {"slug": "java-oop", "name": "OOP in Java", "category": "JAVA", "description": "Encapsulation, inheritance, polymorphism, equals/hashCode."},
+  {"slug": "java-collections", "name": "Collections", "category": "JAVA", "description": "List, Set, Map implementations and their trade-offs."},
+  {"slug": "java-generics", "name": "Generics", "category": "JAVA", "description": "Type parameters, wildcards, erasure."},
+  {"slug": "java-exceptions", "name": "Exceptions", "category": "JAVA", "description": "Checked vs unchecked, try-with-resources."},
+  {"slug": "java-streams", "name": "Streams", "category": "JAVA", "description": "Lazy pipelines, collectors, pitfalls."},
+  {"slug": "java-concurrency", "name": "Concurrency", "category": "JAVA", "description": "Threads, synchronization, ConcurrentHashMap, executors."},
+  {"slug": "jvm-memory", "name": "JVM & memory model", "category": "JAVA", "description": "Heap, GC, happens-before, volatile."},
+  {"slug": "completable-future", "name": "CompletableFuture", "category": "JAVA", "description": "Composing asynchronous work."},
+
+  {"slug": "spring-di", "name": "Dependency injection", "category": "SPRING", "description": "Beans, scopes, proxies."},
+  {"slug": "spring-rest", "name": "REST APIs", "category": "SPRING", "description": "Controllers, status codes, validation, error handling."},
+  {"slug": "spring-security", "name": "Spring Security", "category": "SPRING", "description": "Filter chain, authentication, CSRF."},
+  {"slug": "spring-data-jpa", "name": "JPA & Hibernate", "category": "SPRING", "description": "Entities, fetching, N+1, persistence context."},
+  {"slug": "spring-transactions", "name": "Transactions", "category": "SPRING", "description": "@Transactional semantics and propagation."},
+  {"slug": "spring-caching", "name": "Caching", "category": "SPRING", "description": "Spring cache abstraction."},
+  {"slug": "spring-testing", "name": "Testing", "category": "SPRING", "description": "Slices, mocks, integration tests."},
+  {"slug": "microservices", "name": "Microservices concepts", "category": "SPRING", "description": "Service boundaries and their costs."},
+
+  {"slug": "sql-joins", "name": "SQL & joins", "category": "DATABASES", "description": "Joins, grouping, NULL semantics."},
+  {"slug": "sql-indexes", "name": "Indexes & query optimization", "category": "DATABASES", "description": "B-trees, composite indexes, EXPLAIN."},
+  {"slug": "sql-transactions", "name": "Transactions & isolation", "category": "DATABASES", "description": "ACID, isolation anomalies, deadlocks."},
+  {"slug": "normalization", "name": "Normalization", "category": "DATABASES", "description": "Normal forms and deliberate denormalization."},
+  {"slug": "postgresql", "name": "PostgreSQL", "category": "DATABASES", "description": "MVCC, VACUUM, PostgreSQL-specific features."},
+
+  {"slug": "load-balancing", "name": "Load balancing", "category": "DISTRIBUTED", "description": "L4/L7 balancing, health checks."},
+  {"slug": "distributed-caching", "name": "Caching strategies", "category": "DISTRIBUTED", "description": "Cache-aside, invalidation, stampedes."},
+  {"slug": "rate-limiting", "name": "Rate limiting", "category": "DISTRIBUTED", "description": "Token bucket, windows."},
+  {"slug": "messaging", "name": "Message queues", "category": "DISTRIBUTED", "description": "Delivery guarantees, ordering, consumer groups."},
+  {"slug": "consistency", "name": "Consistency models", "category": "DISTRIBUTED", "description": "CAP, eventual consistency, replication."},
+  {"slug": "resilience", "name": "Idempotency, retries & circuit breakers", "category": "DISTRIBUTED", "description": "Failing safely."},
+  {"slug": "distributed-locks", "name": "Distributed locks", "category": "DISTRIBUTED", "description": "Leases, fencing tokens."},
+
+  {"slug": "system-design-fundamentals", "name": "Design fundamentals", "category": "SYSTEM_DESIGN", "description": "Estimation, sharding, storage choices."},
+
+  {"slug": "frontend-fundamentals", "name": "Frontend fundamentals", "category": "FRONTEND", "description": "Browser, HTTP, React rendering."},
+
+  {"slug": "behavioral", "name": "Behavioral interviews", "category": "BEHAVIORAL", "description": "Structuring stories and answers."},
+
+  {"slug": "rag-retrieval", "name": "RAG & retrieval", "category": "AI_CONCEPTS", "description": "Embeddings, vector search, chunking."},
+  {"slug": "llm-systems", "name": "LLM systems", "category": "AI_CONCEPTS", "description": "Tool calling, MCP, agents, safety, evaluation."}
+]

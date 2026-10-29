@@ -1,0 +1,16 @@
+{"type": "FULL_STACK", "questions": [
+  {"slug": "iv-fs-auth-spa", "difficulty": "MEDIUM", "title": "Authentication for a SPA",
+   "prompt": "You're building a React SPA with a Spring Boot API on another domain. How would you implement authentication securely?",
+   "expectedConcepts": ["HttpOnly, Secure, SameSite cookies vs tokens in localStorage (XSS exposure)", "CSRF protection when using cookies", "CORS with credentials and an explicit origin allowlist", "Same-origin proxy as an option", "Session expiry and logout", "Third-party cookie restrictions"],
+   "answerOutline": "Prefer HttpOnly session cookies, ideally same-site via a proxy, with CSRF tokens. Explain the XSS impact on localStorage tokens, CORS configuration, and the browser cookie policies that complicate cross-site setups.",
+   "commonMistakes": ["Thinking CORS is authentication", "Long-lived JWTs in localStorage without discussing XSS", "Wildcard origins with credentials"],
+   "followUps": ["How do you authenticate a WebSocket?", "How do you revoke sessions?"],
+   "rubricNotes": "5: articulates the threat model (XSS vs CSRF) behind each choice."},
+  {"slug": "iv-fs-slow-page", "difficulty": "MEDIUM", "title": "A slow page",
+   "prompt": "Users say a dashboard page is slow. Walk me through how you'd find and fix the problem across frontend and backend.",
+   "expectedConcepts": ["Measure: browser devtools, Web Vitals, network waterfall", "Backend timing: logs, traces, DB queries", "Bundle size and code splitting", "Over-fetching and N+1 calls", "Caching and pagination", "Rendering cost and unnecessary re-renders"],
+   "answerOutline": "Separate network, backend and render time; fix the biggest contributor first; verify with before and after measurements.",
+   "commonMistakes": ["Guessing without measuring", "Only looking at one layer"],
+   "followUps": ["How do you prevent regressions?"],
+   "rubricNotes": "A systematic approach beats a list of tricks."}
+]}

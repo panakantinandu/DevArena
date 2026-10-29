@@ -1,0 +1,23 @@
+{"type": "SPRING_BOOT", "questions": [
+  {"slug": "iv-spring-transactional", "difficulty": "MEDIUM", "title": "@Transactional in practice",
+   "prompt": "How does @Transactional work in Spring, and what are the common pitfalls?",
+   "expectedConcepts": ["AOP proxy wraps the bean", "Self-invocation bypasses the proxy", "Default rollback only on unchecked exceptions", "Propagation (REQUIRED, REQUIRES_NEW)", "Annotations on non-public methods are ignored by proxy-based AOP", "Transaction boundaries belong in the service layer"],
+   "answerOutline": "Explain the proxy model, then the pitfalls: self-invocation, checked exceptions, catching exceptions inside the method, long transactions holding connections, and calling remote services inside a transaction.",
+   "commonMistakes": ["Assuming all exceptions roll back", "Annotating private methods", "Not knowing about self-invocation"],
+   "followUps": ["When would you use REQUIRES_NEW?", "What does readOnly = true do?", "How do you test transactional behaviour?"],
+   "rubricNotes": "5: explains the proxy mechanism and at least three pitfalls with fixes."},
+  {"slug": "iv-spring-request-lifecycle", "difficulty": "MEDIUM", "title": "Life of a request",
+   "prompt": "Walk me through what happens when an HTTP request hits a Spring Boot REST endpoint.",
+   "expectedConcepts": ["Embedded server (Tomcat) thread", "Servlet filter chain, including Spring Security", "DispatcherServlet", "Handler mapping and argument resolution", "Message converters (Jackson)", "Validation", "Exception handling via @ControllerAdvice"],
+   "answerOutline": "Tomcat accepts the connection, runs the filters (security), then DispatcherServlet finds the handler, binds and validates the body, invokes the controller, and serialises the result. Exceptions go to the advice.",
+   "commonMistakes": ["Skipping the filter chain", "Confusing interceptors and filters"],
+   "followUps": ["Where would you add request logging with a correlation ID?", "How do virtual threads change this?"],
+   "rubricNotes": "Order of components matters more than naming every class."},
+  {"slug": "iv-spring-n-plus-one", "difficulty": "HARD", "title": "Diagnosing slow JPA endpoints",
+   "prompt": "An endpoint listing orders with customer names got slow as data grew. How do you investigate and fix it?",
+   "expectedConcepts": ["Measure first (SQL logging, metrics)", "N+1 selects from lazy associations", "JOIN FETCH / entity graphs / DTO projections", "Pagination", "Indexes on foreign keys", "EXPLAIN ANALYZE"],
+   "answerOutline": "Reproduce, count queries, identify N+1, fix it with fetch joins or projections, add pagination, and verify indexes and plans.",
+   "commonMistakes": ["Jumping to caching without diagnosis", "Switching everything to EAGER", "JOIN FETCH with pagination on collections (in-memory pagination warning)"],
+   "followUps": ["Why is EAGER fetching a poor global fix?", "How would you prevent regressions? (query count assertions)"],
+   "rubricNotes": "Strong candidates measure before fixing."}
+]}

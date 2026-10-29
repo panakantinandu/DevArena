@@ -1,0 +1,23 @@
+{"type": "BEHAVIORAL", "questions": [
+  {"slug": "iv-beh-conflict", "difficulty": "EASY", "title": "Disagreement with a teammate",
+   "prompt": "Tell me about a time you disagreed with a teammate or lead on a technical decision. What happened?",
+   "expectedConcepts": ["STAR structure", "Specific technical context", "Listening to and understanding the other view", "Data or experiments to resolve it", "Outcome and relationship afterwards"],
+   "answerOutline": "A concrete situation, the candidate's own actions (seeking data, proposing a test, escalating appropriately), a clear result, and reflection.",
+   "commonMistakes": ["A story where they were simply right and the other person wrong", "No outcome", "Too much 'we'"],
+   "followUps": ["What would you do differently?", "What if you had lost the argument?"],
+   "rubricNotes": "Score ownership and collaboration, not who won."},
+  {"slug": "iv-beh-ownership", "difficulty": "MEDIUM", "title": "Ownership under pressure",
+   "prompt": "Describe a production incident or a deadline crisis you handled. What did you personally do?",
+   "expectedConcepts": ["Clear timeline", "Prioritisation and communication", "Root cause vs mitigation", "Follow-up actions to prevent recurrence"],
+   "answerOutline": "Stabilise first, communicate status, find the root cause, add tests and monitoring afterwards, and run a blameless review.",
+   "commonMistakes": ["Vague role", "No prevention follow-up"],
+   "followUps": ["How did you communicate with stakeholders?", "What metric told you it was fixed?"],
+   "rubricNotes": "Look for specific actions with measurable impact."},
+  {"slug": "iv-beh-learning", "difficulty": "EASY", "title": "Learning something fast",
+   "prompt": "Tell me about a time you had to learn a new technology quickly to deliver something.",
+   "expectedConcepts": ["Learning strategy", "Balancing learning and delivery", "Result", "What they'd reuse next time"],
+   "answerOutline": "A specific technology, how they ramped up (docs, small prototype, asking experts), what they shipped, and the lessons learned.",
+   "commonMistakes": ["Generic 'I read the docs'", "No delivered result"],
+   "followUps": ["How do you know when you know enough to start?"],
+   "rubricNotes": "Reward a deliberate learning approach."}
+]}

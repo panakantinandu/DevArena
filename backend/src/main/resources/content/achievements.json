@@ -1,0 +1,12 @@
+[
+  {"code": "FIRST_MISSION", "name": "First steps", "description": "Complete your first daily mission.", "icon": "flag", "criteria": "MISSIONS_COMPLETED", "threshold": 1},
+  {"code": "MISSIONS_25", "name": "Daily grinder", "description": "Complete 25 daily missions.", "icon": "list-checks", "criteria": "MISSIONS_COMPLETED", "threshold": 25},
+  {"code": "STREAK_3", "name": "Warming up", "description": "Reach a 3-day streak.", "icon": "flame", "criteria": "STREAK", "threshold": 3},
+  {"code": "STREAK_7", "name": "One full week", "description": "Reach a 7-day streak.", "icon": "flame", "criteria": "STREAK", "threshold": 7},
+  {"code": "STREAK_30", "name": "Unbreakable", "description": "Reach a 30-day streak.", "icon": "shield", "criteria": "STREAK", "threshold": 30},
+  {"code": "FIRST_BATTLE_WIN", "name": "First blood", "description": "Win a quiz battle.", "icon": "swords", "criteria": "BATTLE_WINS", "threshold": 1},
+  {"code": "BATTLE_WINS_10", "name": "Arena regular", "description": "Win 10 quiz battles.", "icon": "trophy", "criteria": "BATTLE_WINS", "threshold": 10},
+  {"code": "FIRST_INTERVIEW", "name": "In the hot seat", "description": "Complete a peer interview as candidate or interviewer.", "icon": "users", "criteria": "INTERVIEWS_COMPLETED", "threshold": 1},
+  {"code": "INTERVIEWS_10", "name": "Interview veteran", "description": "Complete 10 peer interviews.", "icon": "briefcase", "criteria": "INTERVIEWS_COMPLETED", "threshold": 10},
+  {"code": "QUESTIONS_100", "name": "Century", "description": "Answer 100 questions correctly.", "icon": "target", "criteria": "CORRECT_ANSWERS", "threshold": 100}
+]

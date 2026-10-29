@@ -1,0 +1,23 @@
+{"type": "SQL", "questions": [
+  {"slug": "iv-sql-second-highest", "difficulty": "EASY", "title": "Second highest salary",
+   "prompt": "Given employees(id, name, salary), write a query returning the second highest distinct salary, or NULL if it doesn't exist.",
+   "expectedConcepts": ["DISTINCT", "ORDER BY … OFFSET 1 LIMIT 1, or MAX with a subquery", "Handling the empty case with a scalar subquery", "Window functions (DENSE_RANK) as an alternative"],
+   "answerOutline": "SELECT (SELECT DISTINCT salary FROM employees ORDER BY salary DESC OFFSET 1 LIMIT 1) AS second_highest; or use DENSE_RANK() = 2.",
+   "commonMistakes": ["Forgetting DISTINCT with ties", "Returning no row instead of NULL", "Using RANK instead of DENSE_RANK"],
+   "followUps": ["Nth highest per department", "Performance on 100M rows: what index helps?"],
+   "rubricNotes": "Reward tie handling and the window-function generalisation."},
+  {"slug": "iv-sql-isolation", "difficulty": "MEDIUM", "title": "Isolation levels",
+   "prompt": "Explain transaction isolation levels and the anomalies each one prevents.",
+   "expectedConcepts": ["Dirty read, non-repeatable read, phantom read", "READ COMMITTED (PostgreSQL default)", "REPEATABLE READ (snapshot in PostgreSQL)", "SERIALIZABLE (SSI in PostgreSQL)", "Lost updates and write skew", "Retrying serialization failures"],
+   "answerOutline": "Define each anomaly with an example, map the levels to the anomalies, note that PostgreSQL implementations differ from the textbook (e.g. no dirty reads), and explain that SERIALIZABLE requires retry logic.",
+   "commonMistakes": ["Thinking higher isolation is free", "Not knowing the database's default", "Ignoring write skew"],
+   "followUps": ["How do you prevent double-booking a seat?", "SELECT … FOR UPDATE vs optimistic locking"],
+   "rubricNotes": "Concrete examples per anomaly separate a 4-5 from a 2-3."},
+  {"slug": "iv-sql-index-design", "difficulty": "MEDIUM", "title": "Designing indexes",
+   "prompt": "A query filters orders by customer_id and status, sorted by created_at DESC, with LIMIT 20. What index would you create and why?",
+   "expectedConcepts": ["Composite index (customer_id, status, created_at DESC)", "Leftmost prefix rule", "Index supports both filter and sort, avoiding a sort step", "Selectivity", "Write overhead"],
+   "answerOutline": "Equality columns first, then the sort column, so the database can walk the index in order and stop after 20 rows. Verify with EXPLAIN ANALYZE.",
+   "commonMistakes": ["Separate single-column indexes for everything", "Putting the range or sort column first"],
+   "followUps": ["What if status has only 3 values?", "Partial index for status = 'OPEN'?"],
+   "rubricNotes": "Look for reasoning about column order, not just 'add an index'."}
+]}
