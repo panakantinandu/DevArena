@@ -1,0 +1,30 @@
+# Production profile (Render). Every secret comes from the environment; nothing is hardcoded.
+spring:
+  datasource:
+    # Example: jdbc:postgresql://<host>/<db>?sslmode=require
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:4}
+      minimum-idle: 0
+      idle-timeout: 120000
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+        same-site: lax
+
+devarena:
+  secure-cookies: true
+  cors-allowed-origins: ${DEVARENA_CORS_ALLOWED_ORIGINS}
+
+logging:
+  level:
+    root: INFO
+    com.devarena: INFO
