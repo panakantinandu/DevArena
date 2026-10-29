@@ -1,0 +1,166 @@
+@import "tailwindcss";
+@import "@fontsource/lexend-mega/600.css";
+@import "@fontsource/lexend-mega/700.css";
+@import "@fontsource/lexend-mega/800.css";
+@import "@fontsource/public-sans/400.css";
+@import "@fontsource/public-sans/500.css";
+@import "@fontsource/public-sans/600.css";
+@import "@fontsource/public-sans/700.css";
+@import "@fontsource/public-sans/800.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/700.css";
+
+/*
+ * DevArena "Neubrutalist Arena" theme. See design-system/devarena/MASTER.md.
+ * Style + palette + fonts from the ui-ux-pro-max skill (Neubrutalism, "Neubrutalist Bold" pairing).
+ * Light = cream paper with ink outlines; dark = charcoal with cream outlines. Same poster accents.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f4efe3;
+  --surface-1: #fffdf7;
+  --surface-2: #efe8d8;
+  --surface-3: #e5dcc6;
+  --line: #111111;
+  --line-soft: rgb(17 17 17 / 0.16);
+  --text: #111111;
+  --muted: #57534a;
+  --brand: #ffd23f;        /* signal yellow fill (ink text on it: 13:1) */
+  --brand-hover: #ffc61a;
+  --brand-text: #1d4ed8;   /* ink blue for links/accents on cream: 6.1:1 */
+  --live: #ff5a36;         /* tomato fill (ink text on it: 6.4:1) */
+  --live-text: #b42d14;    /* tomato as text on cream: 5.6:1 */
+  --success: #15803d;
+  --warning: #92600a;
+  --danger: #c81e1e;
+  --shadow: #111111;
+  --dots: rgb(17 17 17 / 0.13);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #171614;
+  --surface-1: #211f1c;
+  --surface-2: #2b2925;
+  --surface-3: #37342f;
+  --line: #f4efe3;
+  --line-soft: rgb(244 239 227 / 0.18);
+  --text: #f4efe3;
+  --muted: #b8b1a2;
+  --brand: #ffd23f;
+  --brand-hover: #ffdd66;
+  --brand-text: #ffd23f;   /* yellow text on charcoal: 12:1 */
+  --live: #ff5a36;
+  --live-text: #ff8a6b;
+  --success: #4ade80;
+  --warning: #ffd23f;
+  --danger: #ff7070;
+  --shadow: #f4efe3;
+  --dots: rgb(244 239 227 / 0.09);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-display: "Lexend Mega", "Public Sans", ui-sans-serif, sans-serif;
+  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+
+  --color-bg: var(--bg);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-text: var(--brand-text);
+  --color-live: var(--live);
+  --color-live-text: var(--live-text);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-ink: #111111;
+
+  --radius-ctl: 6px;
+  --radius-panel: 8px;
+
+  --text-2xs: 0.6875rem;
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+  }
+  body {
+    @apply bg-bg font-sans text-text antialiased;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  /* Lexend Mega is very wide: reserve it for display sizes and keep it tight. */
+  h1 {
+    @apply font-display;
+    letter-spacing: -0.045em;
+    line-height: 1.1;
+  }
+  h2, h3, h4 {
+    @apply font-sans font-extrabold tracking-tight;
+    line-height: 1.2;
+  }
+  :focus-visible {
+    outline: 3px solid var(--brand-text);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--brand);
+    color: #111;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-mono text-2xs font-bold uppercase tracking-[0.12em] text-muted;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  /* The signature: ink outline + hard offset shadow, no blur. */
+  .panel {
+    @apply rounded-panel border-2 border-line bg-surface-1;
+    box-shadow: 4px 4px 0 0 var(--shadow);
+  }
+  .hard-shadow {
+    box-shadow: 4px 4px 0 0 var(--shadow);
+  }
+  /* Arena frames get a yellow poster shadow. */
+  .brackets {
+    box-shadow: 6px 6px 0 0 var(--brand) !important;
+  }
+  /* Dot grid texture (skill: Bauhaus / Neubrutalism section pattern). */
+  /* Lexend Mega for big display text only. */
+  .display {
+    font-family: var(--font-display);
+    letter-spacing: -0.045em;
+  }
+  .grid-bg {
+    background-image: radial-gradient(var(--dots) 1.2px, transparent 1.2px);
+    background-size: 18px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
