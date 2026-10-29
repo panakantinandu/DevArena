@@ -1,0 +1,23 @@
+# Render Blueprint for the backend. Secrets are marked sync:false and entered in the Render dashboard.
+services:
+  - type: web
+    name: devarena-api
+    runtime: docker
+    plan: free
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health
+    autoDeploy: false
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: DEVARENA_CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: DB_POOL_MAX
+        value: "4"
