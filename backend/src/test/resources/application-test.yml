@@ -1,0 +1,7 @@
+devarena:
+  cors-allowed-origins: http://localhost:5173
+  login-max-attempts: 5
+logging:
+  level:
+    root: WARN
+    com.devarena: INFO
