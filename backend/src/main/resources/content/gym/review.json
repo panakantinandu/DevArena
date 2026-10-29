@@ -1,0 +1,65 @@
+[
+  {"slug": "rev-transfer", "mode": "REVIEW", "difficulty": "MEDIUM", "title": "Money transfer service",
+   "public": {"intro": "An assistant wrote this transfer method for a banking feature. It compiles and the happy-path test passes. Click every line that contains a real defect.",
+     "language": "java",
+     "code": "@Service\npublic class TransferService {\n    private final AccountRepository accounts;\n\n    public TransferService(AccountRepository accounts) { this.accounts = accounts; }\n\n    public void transfer(long fromId, long toId, long amountCents) {\n        Account from = accounts.findById(fromId).orElseThrow();\n        Account to = accounts.findById(toId).orElseThrow();\n        if (from.getBalance() >= amountCents) {\n            from.setBalance(from.getBalance() - amountCents);\n            to.setBalance(to.getBalance() + amountCents);\n            accounts.save(from);\n            accounts.save(to);\n        }\n    }\n}"},
+   "secret": {"bugs": [
+     {"lines": [7], "title": "Not atomic, no input validation", "explanation": "No @Transactional, so a crash between the two saves creates or destroys money. The method also accepts amountCents ≤ 0 (a negative amount reverses the transfer) and fromId == toId."},
+     {"lines": [10, 11], "title": "Check-then-act race", "explanation": "Two concurrent transfers can both pass the balance check, then both debit, overdrawing the account. Use a single conditional UPDATE (balance = balance - ? WHERE balance >= ?), a row lock (SELECT … FOR UPDATE), or optimistic versioning."}
+   ]},
+   "explanation": "Money code needs atomicity, protection against concurrent updates, and input validation. Plausible-looking generated code usually covers the happy path only."},
+
+  {"slug": "rev-sql-injection", "mode": "REVIEW", "difficulty": "EASY", "title": "Find users by name",
+   "public": {"intro": "Generated data-access code. Click every line that contains a real defect.",
+     "language": "java",
+     "code": "public List<User> findByName(String name) throws SQLException {\n    Connection conn = dataSource.getConnection();\n    Statement st = conn.createStatement();\n    ResultSet rs = st.executeQuery(\n        \"SELECT id, name, email FROM users WHERE name = '\" + name + \"'\");\n    List<User> out = new ArrayList<>();\n    while (rs.next()) {\n        out.add(new User(rs.getLong(\"id\"), rs.getString(\"name\"), rs.getString(\"email\")));\n    }\n    return out;\n}"},
+   "secret": {"bugs": [
+     {"lines": [4, 5], "title": "SQL injection", "explanation": "User input is concatenated into SQL. A name like ' OR '1'='1 returns every user. Use a PreparedStatement with a ? parameter."},
+     {"lines": [2, 3, 10], "title": "Resource leak", "explanation": "Connection, Statement and ResultSet are never closed. Under load this exhausts the connection pool. Use try-with-resources."}
+   ]},
+   "explanation": "These are two of the oldest defects in data-access code, and they still appear in generated code all the time."},
+
+  {"slug": "rev-binary-search", "mode": "REVIEW", "difficulty": "MEDIUM", "title": "Binary search",
+   "public": {"intro": "An assistant wrote this search for a sorted int array. Click every line that contains a real defect.",
+     "language": "java",
+     "code": "// Returns the index of target in a sorted array, or -1.\nstatic int search(int[] a, int target) {\n    int lo = 0, hi = a.length;\n    while (lo <= hi) {\n        int mid = (lo + hi) / 2;\n        if (a[mid] == target) return mid;\n        if (a[mid] < target) lo = mid;\n        else hi = mid - 1;\n    }\n    return -1;\n}"},
+   "secret": {"bugs": [
+     {"lines": [3, 4], "title": "Bounds mismatch", "explanation": "hi starts at a.length but the loop uses lo <= hi, so mid can equal a.length and throw ArrayIndexOutOfBoundsException. Use hi = a.length - 1 with lo <= hi (or hi = a.length with lo < hi)."},
+     {"lines": [7], "title": "Infinite loop", "explanation": "lo = mid doesn't make progress when lo == mid (e.g. two elements left). It must be lo = mid + 1."},
+     {"lines": [5], "title": "Overflow", "explanation": "(lo + hi) can overflow int for very large arrays. Use lo + (hi - lo) / 2 or (lo + hi) >>> 1."}
+   ]},
+   "explanation": "Binary search is famously easy to get subtly wrong. Check that the invariant, the loop condition and the update rules agree with each other."},
+
+  {"slug": "rev-rate-counter", "mode": "REVIEW", "difficulty": "MEDIUM", "title": "In-memory rate limiter",
+   "public": {"intro": "A rate limiter singleton called from many request threads at once. Click every line that contains a real defect.",
+     "language": "java",
+     "code": "@Component\npublic class RateCounter {\n    private final Map<String, Integer> counts = new HashMap<>();\n\n    // Called concurrently from many request threads.\n    public boolean allow(String apiKey, int limit) {\n        Integer current = counts.get(apiKey);\n        if (current == null) current = 0;\n        if (current >= limit) return false;\n        counts.put(apiKey, current + 1);\n        return true;\n    }\n\n    @Scheduled(fixedRate = 60_000)\n    public void reset() { counts.clear(); }\n}"},
+   "secret": {"bugs": [
+     {"lines": [3], "title": "Not thread-safe", "explanation": "HashMap under concurrent writes can lose updates and corrupt its internal structure. Use ConcurrentHashMap."},
+     {"lines": [7, 9, 10], "title": "Check-then-act race", "explanation": "Even with ConcurrentHashMap, get → compare → put isn't atomic, so concurrent requests exceed the limit. Use counts.merge(key, 1, Integer::sum) or compute(), and compare the returned value."}
+   ]},
+   "explanation": "A concurrent collection makes single operations safe, not sequences of them. That distinction is one of the most valuable things to check in reviews."},
+
+  {"slug": "rev-money-equals", "mode": "REVIEW", "difficulty": "EASY", "title": "Money value object",
+   "public": {"intro": "A value object used as a key in HashMap and HashSet. Click every line that contains a real defect.",
+     "language": "java",
+     "code": "public final class Money {\n    private final long cents;\n    private final String currency;\n\n    public Money(long cents, String currency) {\n        this.cents = cents;\n        this.currency = currency;\n    }\n\n    @Override\n    public boolean equals(Object o) {\n        if (!(o instanceof Money m)) return false;\n        return cents == m.cents && currency == m.currency;\n    }\n}"},
+   "secret": {"bugs": [
+     {"lines": [13], "title": "String compared with ==", "explanation": "== compares references. Two equal currency strings built at runtime (e.g. parsed from JSON) aren't ==. Use currency.equals(m.currency) or Objects.equals."},
+     {"lines": [11, 15], "title": "equals without hashCode", "explanation": "Overriding equals without hashCode breaks the contract: equal Money values land in different hash buckets, so HashSet and HashMap lookups fail. A record would generate both."}
+   ]},
+   "explanation": "Value objects are a great fit for Java records, which get equals, hashCode and toString right automatically."},
+
+  {"slug": "rev-retry-forever", "mode": "REVIEW", "difficulty": "HARD", "title": "\"Robust\" payment retry",
+   "public": {"intro": "An assistant was asked to make payment calls 'robust'. Click every line that contains a real defect.",
+     "language": "java",
+     "code": "// Generated helper: retries the payment call until it succeeds.\npublic PaymentResult chargeWithRetry(ChargeRequest req) {\n    int attempt = 0;\n    while (true) {\n        try {\n            return paymentClient.charge(req);\n        } catch (Exception e) {\n            attempt++;\n            try {\n                Thread.sleep(1000);\n            } catch (InterruptedException ie) {\n                // ignore\n            }\n        }\n    }\n}"},
+   "secret": {"bugs": [
+     {"lines": [3, 4, 8], "title": "Unbounded retries", "explanation": "attempt is counted but never checked. A persistent failure blocks the thread forever. Cap the number of attempts and surface the failure."},
+     {"lines": [6], "title": "Retrying a non-idempotent charge", "explanation": "A timeout may mean the charge succeeded. Retrying without a stable idempotency key causes double charges."},
+     {"lines": [7], "title": "Retries everything", "explanation": "Catching Exception also retries permanent errors such as a declined card or validation failure (4xx). Retry only transient failures."},
+     {"lines": [11, 12], "title": "Swallowed interrupt", "explanation": "Ignoring InterruptedException makes shutdown hang. Restore the flag with Thread.currentThread().interrupt() and stop."},
+     {"lines": [10], "title": "No backoff or jitter", "explanation": "A fixed 1 s sleep in every client hammers a struggling provider in lockstep. Use exponential backoff with jitter."}
+   ]},
+   "explanation": "'Robust' code that retries blindly is often the cause of the outage. Good retry logic is bounded, selective, idempotent, interruptible, and backs off with jitter."}
+]

@@ -1,0 +1,121 @@
+[
+  {"slug": "tr-background-jobs", "mode": "TRADEOFF", "difficulty": "EASY", "title": "Background jobs for a two-person startup",
+   "public": {"context": "Two engineers run a Spring Boot + PostgreSQL product. You need background jobs: sending emails, generating PDFs, about 20k jobs per day, retries required.",
+     "constraints": ["Two engineers, no dedicated ops", "~20k jobs/day, bursty", "Jobs must survive restarts and retry on failure", "Budget is tight"],
+     "options": [
+       {"id": "kafka", "label": "Run a Kafka cluster", "description": "Publish job events to Kafka topics; consumers process them."},
+       {"id": "pg-queue", "label": "Jobs table in PostgreSQL", "description": "A jobs table claimed with SELECT … FOR UPDATE SKIP LOCKED by worker threads, with attempt counts and next_run_at."},
+       {"id": "redis", "label": "Add Redis with a queue library", "description": "Introduce Redis and a job-queue library on top of it."},
+       {"id": "memory", "label": "In-process executor", "description": "Submit jobs to an in-memory ExecutorService."}
+     ],
+     "risks": [
+       {"id": "throughput", "text": "The database becomes a throughput and contention bottleneck if job volume grows by orders of magnitude"},
+       {"id": "no-ordering", "text": "Jobs can't be ordered"},
+       {"id": "vendor-lockin", "text": "Vendor lock-in to PostgreSQL"},
+       {"id": "no-retries", "text": "Retries are impossible"}
+     ]},
+   "secret": {"options": {
+       "kafka": {"score": 25, "rationale": "Powerful, but a heavy operational burden for two people and 20k/day. Kafka also doesn't give per-job retries or scheduling out of the box."},
+       "pg-queue": {"score": 100, "rationale": "Uses infrastructure you already run, is transactional with your data (enqueue in the same transaction as the business change), durable, and easily handles 20k/day."},
+       "redis": {"score": 60, "rationale": "Reasonable and common, but adds a new stateful component to operate and loses transactional enqueue with your data."},
+       "memory": {"score": 5, "rationale": "Jobs vanish on restart or crash, which violates the durability requirement."}},
+     "bestRisk": "throughput",
+     "riskExplanation": "A Postgres-backed queue is great until job volume and churn get very high. Then vacuum, contention and index bloat show up. That's the risk you accept, and you revisit it when metrics say so."},
+   "explanation": "Senior judgment means the simplest system that meets the real constraints, with the accepted risk named and monitored, rather than the most impressive one."},
+
+  {"slug": "tr-read-heavy-catalog", "mode": "TRADEOFF", "difficulty": "MEDIUM", "title": "A read-heavy product catalogue",
+   "public": {"context": "A product catalogue API serves 50k reads/s at peak. Products change a few times per hour. Today it hits PostgreSQL directly, which is at 85% CPU.",
+     "constraints": ["Reads ≫ writes", "Staleness of up to ~1 minute is acceptable", "The team knows PostgreSQL well", "Needs a fix within weeks, not months"],
+     "options": [
+       {"id": "cache-cdn", "label": "Cache layer + CDN", "description": "Cache product responses (CDN/HTTP caching + an application cache) with short TTLs and purge on update."},
+       {"id": "replicas", "label": "Add read replicas only", "description": "Route reads to two or three PostgreSQL replicas."},
+       {"id": "shard", "label": "Shard the database", "description": "Split products across several primaries by product ID."},
+       {"id": "nosql", "label": "Migrate to a NoSQL store", "description": "Move the catalogue to a document database."}
+     ],
+     "risks": [
+       {"id": "staleness", "text": "Serving stale data after updates, and invalidation bugs"},
+       {"id": "write-loss", "text": "Losing writes"},
+       {"id": "joins", "text": "Joins become impossible"},
+       {"id": "cost-zero", "text": "No risk; caching is free"}
+     ]},
+   "secret": {"options": {
+       "cache-cdn": {"score": 100, "rationale": "With very high read/write ratios and tolerated staleness, caching removes most database load cheaply and quickly."},
+       "replicas": {"score": 60, "rationale": "Helps and is low-risk, but scales linearly with cost and still does work per read that a cache wouldn't. A fine complement."},
+       "shard": {"score": 15, "rationale": "Solves a write-scaling problem you don't have, at a large complexity cost."},
+       "nosql": {"score": 10, "rationale": "A months-long migration that doesn't address the core issue (repeated identical reads)."}},
+     "bestRisk": "staleness",
+     "riskExplanation": "Caching trades freshness for load. Name the staleness budget, purge on writes, and use short TTLs as a safety net."},
+   "explanation": "Match the solution to the shape of the load. Repeated identical reads with relaxed freshness is exactly what caching is for."},
+
+  {"slug": "tr-balance-consistency", "mode": "TRADEOFF", "difficulty": "HARD", "title": "Where should the balance live?",
+   "public": {"context": "Wallet balances are currently updated by three services (payments, refunds, rewards), each writing to its own database and syncing through events. Users occasionally see wrong balances, and finance found a few overdrafts.",
+     "constraints": ["Balances must never go negative", "An audit trail is required", "Three teams touch money today", "Moderate traffic (hundreds of TPS)"],
+     "options": [
+       {"id": "ledger-owner", "label": "One ledger service owns balances", "description": "A single service owns an append-only double-entry ledger; other services request debits and credits through its API with idempotency keys."},
+       {"id": "2pc", "label": "Distributed transactions (2PC)", "description": "Coordinate the three databases with two-phase commit."},
+       {"id": "more-events", "label": "Better eventual consistency", "description": "Keep three writers but add retries and reconciliation jobs."},
+       {"id": "shared-db", "label": "Shared database table", "description": "Let all three services write the same balances table directly."}
+     ],
+     "risks": [
+       {"id": "bottleneck", "text": "The ledger service becomes a critical dependency and possible bottleneck that must be highly available"},
+       {"id": "no-audit", "text": "No audit trail"},
+       {"id": "negative", "text": "Balances can go negative"},
+       {"id": "none", "text": "There's no meaningful risk"}
+     ]},
+   "secret": {"options": {
+       "ledger-owner": {"score": 100, "rationale": "A single writer makes the invariant (balance ≥ 0) enforceable in one transaction, and a ledger gives the audit trail."},
+       "2pc": {"score": 30, "rationale": "Technically gives atomicity, but it is operationally fragile (blocking coordinators, poor support across services) and still has three writers."},
+       "more-events": {"score": 25, "rationale": "Eventual consistency can't guarantee a non-negative balance across concurrent writers. Reconciliation finds overdrafts after they happen."},
+       "shared-db": {"score": 45, "rationale": "Consistency becomes possible, but three teams coupling to one table's schema and invariants is a maintenance trap."}},
+     "bestRisk": "bottleneck",
+     "riskExplanation": "Centralising ownership concentrates risk, so the ledger needs high availability, idempotent APIs and capacity planning. That is still far easier than distributed invariants."},
+   "explanation": "When an invariant must always hold, give it exactly one owner. Strong consistency is cheap inside one database and expensive across many."},
+
+  {"slug": "tr-docs-assistant", "mode": "TRADEOFF", "difficulty": "MEDIUM", "title": "An assistant over internal docs",
+   "public": {"context": "Leadership wants a Q&A assistant over 40k internal documents (wikis, runbooks, HR policies). Documents change daily, and different teams can see different documents.",
+     "constraints": ["Docs change daily", "Per-team access control must hold", "Answers should be traceable to sources", "Small team, no ML research staff"],
+     "options": [
+       {"id": "rag", "label": "Permission-aware RAG with citations", "description": "Index chunks with ACL metadata; retrieve only what the asking user may see; answer with citations; evaluate on a fixed question set."},
+       {"id": "finetune", "label": "Fine-tune a model on all documents", "description": "Train the docs into a model's weights."},
+       {"id": "stuff", "label": "Put everything in the prompt", "description": "Send as many documents as fit into a large context window on every question."},
+       {"id": "search", "label": "Better keyword search, no LLM", "description": "Improve the search engine with synonyms and ranking; return documents, not answers."}
+     ],
+     "risks": [
+       {"id": "retrieval", "text": "Wrong or missing retrieval produces confident wrong answers, and ACL filtering bugs leak documents"},
+       {"id": "gpu", "text": "Needs a GPU cluster"},
+       {"id": "no-updates", "text": "Can't handle document updates"},
+       {"id": "none", "text": "No risk"}
+     ]},
+   "secret": {"options": {
+       "rag": {"score": 100, "rationale": "Handles daily updates by re-indexing, enforces access at retrieval time, and gives traceable citations. It's the standard pattern for this problem."},
+       "finetune": {"score": 15, "rationale": "Weights can't enforce per-user permissions, go stale daily, can't cite sources reliably, and need ML expertise."},
+       "stuff": {"score": 25, "rationale": "40k docs don't fit; cost and latency explode, and it still needs permission filtering."},
+       "search": {"score": 60, "rationale": "A legitimate, cheaper baseline, and often the right first step. Users do more of the reading, but nothing is hallucinated."}},
+     "bestRisk": "retrieval",
+     "riskExplanation": "In RAG, quality and safety come from retrieval. Measure it with an evaluation set and test permission filtering explicitly, including adversarial cases."},
+   "explanation": "AI-era judgment: start from the constraints (freshness, permissions, traceability), and remember that a non-LLM baseline is a valid option to beat."},
+
+  {"slug": "tr-monolith-split", "mode": "TRADEOFF", "difficulty": "EASY", "title": "Scaling a four-person team's codebase",
+   "public": {"context": "A four-person team's monolith is getting tangled: changes in billing break notifications, and tests take 20 minutes. Someone proposes microservices.",
+     "constraints": ["Four engineers", "One deployment pipeline today", "Coupling bugs are the main pain", "Traffic is fine on one instance"],
+     "options": [
+       {"id": "modular", "label": "Modular monolith", "description": "Define module boundaries (packages with public APIs, no cross-module table access), enforce them with architecture tests, and speed up the test suite."},
+       {"id": "micro", "label": "Microservice per entity", "description": "Split into users, billing, notifications, orders… services, each with its own database."},
+       {"id": "serverless", "label": "Function per endpoint", "description": "Rewrite each endpoint as a serverless function."},
+       {"id": "nothing", "label": "Keep going as is", "description": "Accept the tangle; add more end-to-end tests."}
+     ],
+     "risks": [
+       {"id": "erosion", "text": "Boundaries erode over time unless they're enforced automatically"},
+       {"id": "network", "text": "Network latency between services"},
+       {"id": "scaling", "text": "Can't scale traffic"},
+       {"id": "none", "text": "No risk"}
+     ]},
+   "secret": {"options": {
+       "modular": {"score": 100, "rationale": "Tackles the actual problem (coupling) without adding distributed-systems costs. You can still extract a service later along a clean boundary."},
+       "micro": {"score": 20, "rationale": "Four people would own network failures, distributed data and many pipelines to fix a modularity problem."},
+       "serverless": {"score": 15, "rationale": "A rewrite that fragments the code further and doesn't address coupling."},
+       "nothing": {"score": 10, "rationale": "The pain compounds; more slow end-to-end tests make the feedback loop worse."}},
+     "bestRisk": "erosion",
+     "riskExplanation": "Module boundaries are only as strong as their enforcement: dependency rules in CI (e.g. ArchUnit), code ownership, and no shared tables."},
+   "explanation": "Fix coupling with boundaries, not network calls. Distribution is a cost you take on only when team or scale pressure demands it."}
+]
